@@ -2,11 +2,35 @@
 
 #include "Window.h"
 #include "Texts.h"
+#include "KeyCode.h"
+#include "Game.h"
+
+KeyCode RemapKeyCode(WPARAM winKeyCode)
+{
+	switch (winKeyCode)
+	{
+	case VK_LEFT:
+		return ARROWLEFT;
+	case VK_RIGHT:
+		return ARROWRIGHT;
+	case VK_UP:
+		return ARROWUP;
+	case VK_DOWN:
+		return ARROWDOWN;
+	case VK_SPACE:
+		return SPACE;
+	default:
+		break;
+	}
+	return UNSUPPORTED;
+}
 
 LRESULT CALLBACK WindowFunction(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	Window* window = reinterpret_cast<Window *>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+	Window* window = reinterpret_cast<Window*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 	if (window)
+	{
+		Game* game = window->GetGame();
 		switch (message)
 		{
 		case WM_PAINT:
@@ -22,34 +46,42 @@ LRESULT CALLBACK WindowFunction(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 			return 0;
 
 		case WM_LBUTTONDOWN:
-			window->MouseLeftDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+			if (game)
+				game->MouseLeftDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			break;
 		case WM_LBUTTONUP:
-			window->MouseLeftUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+			if (game)
+				game->MouseLeftUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			break;
 		case WM_RBUTTONDOWN:
-			window->MouseRightDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+			if (game)
+				game->MouseRightDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			break;
 		case WM_RBUTTONUP:
-			window->MouseRightUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+			if (game)
+				game->MouseRightUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			break;
 		case WM_MOUSEMOVE:
-			window->MouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+			if (game)
+				game->MouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 			break;
 
 		case WM_KEYDOWN:
-			window->KeyDown((unsigned)wParam);
+			if (game)
+				game->KeyDown(RemapKeyCode(wParam));
 			break;
 		case WM_KEYUP:
 			if (wParam == VK_ESCAPE)
 				PostQuitMessage(0);
 			else
-				window->KeyUp((unsigned)wParam);
+				if (game)
+					game->KeyUp(RemapKeyCode(wParam));
 			break;
-		
+
 		default:
 			break;
 		}
+	}
 	return DefWindowProc(hWnd, message, wParam, lParam);
 }
 
@@ -77,9 +109,9 @@ const wchar_t* Window::GetErrorText(Window::Error errorId)
 
 Window::Window()
 	: hWnd(NULL),
-		hDC(NULL),
-		hRC(NULL),
-		game(NULL)
+	hDC(NULL),
+	hRC(NULL),
+	game(NULL)
 {
 }
 
@@ -141,15 +173,15 @@ Window::Error Window::Create(const wchar_t* className, const wchar_t* title, int
 	AdjustWindowRectEx(&wndRect, style, FALSE, extStyle);
 
 	hWnd = CreateWindowEx(
-					extStyle,
-					className,
-					title,
-					style | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-					0, 0, wndRect.right - wndRect.left, wndRect.bottom - wndRect.top,
-					NULL,
-					NULL,
-					GetModuleHandle(NULL),
-					NULL);
+		extStyle,
+		className,
+		title,
+		style | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
+		0, 0, wndRect.right - wndRect.left, wndRect.bottom - wndRect.top,
+		NULL,
+		NULL,
+		GetModuleHandle(NULL),
+		NULL);
 	if (!hWnd)
 		return CREATEWINDOW;
 	SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
@@ -232,66 +264,4 @@ void Window::Update()
 {
 	if (game)
 		game->Update();
-}
-
-void Window::MouseLeftDown(int xPos, int yPos)
-{
-	if (game)
-		game->MouseLeftDown(xPos, yPos);
-}
-
-void Window::MouseLeftUp(int xPos, int yPos)
-{
-	if (game)
-		game->MouseLeftUp(xPos, yPos);
-}
-
-void Window::MouseRightDown(int xPos, int yPos)
-{
-	if (game)
-		game->MouseRightDown(xPos, yPos);
-}
-
-void Window::MouseRightUp(int xPos, int yPos)
-{
-	if (game)
-		game->MouseRightUp(xPos, yPos);
-}
-
-void Window::MouseMove(int xPos, int yPos)
-{
-	if (game)
-		game->MouseMove(xPos, yPos);
-}
-
-KeyCode Window::RemapKeyCode(unsigned keyCode)
-{
-	switch (keyCode)
-	{
-	case VK_LEFT:
-		return ARROWLEFT;
-	case VK_RIGHT:
-		return ARROWRIGHT;
-	case VK_UP:
-		return ARROWUP;
-	case VK_DOWN:
-		return ARROWDOWN;
-	case VK_SPACE:
-		return SPACE;
-	default:
-		break;
-	}
-	return UNSUPPORTED;
-}
-
-void Window::KeyDown(unsigned keyCode)
-{
-	if (game)
-		game->KeyDown(RemapKeyCode(keyCode));
-}
-
-void Window::KeyUp(unsigned keyCode)
-{
-	if (game)
-		game->KeyUp(RemapKeyCode(keyCode));
 }

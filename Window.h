@@ -3,8 +3,7 @@
 
 #include <windows.h>
 
-#include "Game.h"
-#include "KeyCode.h"
+class Game;
 
 class Window
 {
@@ -12,9 +11,8 @@ class Window
 	HDC			hDC;
 	HGLRC		hRC;
 
-	Game*	game;
+	Game* game;
 
-	KeyCode RemapKeyCode(unsigned keyCode);
 public:
 	enum Error
 	{
@@ -35,6 +33,7 @@ public:
 	~Window();
 
 	void SetGame(Game* newGame) { game = newGame; }
+	Game* GetGame() { return game; }
 
 	Error Create(const wchar_t* className, const wchar_t* title, int width, int height);
 	void Destroy(const wchar_t* className);
@@ -44,13 +43,4 @@ public:
 	void Resize(int iW, int iH);
 	void Draw();
 	void Update();
-
-	void MouseLeftDown(int xPos, int yPos);
-	void MouseLeftUp(int xPos, int yPos);
-	void MouseRightDown(int xPos, int yPos);
-	void MouseRightUp(int xPos, int yPos);
-	void MouseMove(int xPos, int yPos);
-
-	void KeyDown(unsigned keyCode);
-	void KeyUp(unsigned keyCode);
 };
