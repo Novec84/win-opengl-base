@@ -1,13 +1,15 @@
 
 #include "Texts.h"
+#include "Font.h"
 
 #include <gl/gl.h>
 
-#include <stdio.h>
+#include <map>
 #include <cstdarg>
 
+
 HDC Texts::dc;
-std::map<unsigned, Font*> Texts::fonts;
+std::map<unsigned, Font*> fonts;
 
 void Texts::Destroy()
 {
@@ -30,7 +32,7 @@ unsigned Texts::CreateFont(const wchar_t* name, int height, bool bold, bool curs
 		delete font;
 		return 0;
 	}
-	unsigned fontId = fonts.empty() ? 0 :  fonts.rbegin()->first;
+	unsigned fontId = fonts.empty() ? 0 : fonts.rbegin()->first;
 	fontId++;
 	fonts[fontId] = font;
 	return fontId;
@@ -74,7 +76,7 @@ void Texts::DrawText(unsigned fontId, double x, double y, const char* fmt, ...)
 
 	glRasterPos2d(x, y);
 	glPushAttrib(GL_LIST_BIT);
-		glListBase(font->fontBase);
-		glCallLists((GLsizei)strlen(text), GL_UNSIGNED_BYTE, text);
+	glListBase(font->fontBase);
+	glCallLists((GLsizei)strlen(text), GL_UNSIGNED_BYTE, text);
 	glPopAttrib();
 }

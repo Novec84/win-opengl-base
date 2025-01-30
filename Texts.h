@@ -1,15 +1,10 @@
 #pragma once
 
-#include "Font.h"
-
-#include <map>
-
 #include <Windows.h>
 
 class Texts
 {
 	static HDC dc;
-	static std::map<unsigned, Font*> fonts;
 public:
 	Texts() = delete;
 
