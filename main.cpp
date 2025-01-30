@@ -12,7 +12,7 @@ int main()
 	Application		application;
 	Window			window;
 	Window::Error	error;
-	//Game*			game;
+	//Game			game;
 
 	application.PrepareRandoms();
 
@@ -23,8 +23,7 @@ int main()
 		return -1;
 	}
 
-	//game = new Game();
-	//window.SetGame(game);
+	//window.SetGame(&game);
 
 	window.Init(WINDOWWIDTH, WINDOWHEIGHT);
 	window.Show();
@@ -33,8 +32,6 @@ int main()
 
 	window.Hide();
 	window.Destroy(CLASSNAME);
-
-	//delete game;
 
 	return 0;
 }
