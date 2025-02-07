@@ -12,6 +12,7 @@ public:
 	static void Destroy();
 
 	static unsigned CreateFont(const wchar_t* name, int height, bool bold, bool cursive, bool underscore, bool crossed);
+	static void DestroyFont(unsigned fontId);
 
 	static int GetTextHeight(unsigned fontId);
 	static int GetTextWidth(unsigned fontId, const char* fmt, ...);

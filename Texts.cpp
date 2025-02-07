@@ -7,9 +7,10 @@
 #include <map>
 #include <cstdarg>
 
+typedef std::map<unsigned, Font*> FontStoreType;
 
 HDC Texts::dc;
-std::map<unsigned, Font*> fonts;
+FontStoreType fonts;
 
 void Texts::Destroy()
 {
@@ -36,6 +37,17 @@ unsigned Texts::CreateFont(const wchar_t* name, int height, bool bold, bool curs
 	fontId++;
 	fonts[fontId] = font;
 	return fontId;
+}
+
+void Texts::DestroyFont(unsigned fontId)
+{
+	FontStoreType::iterator it = fonts.find(fontId);
+	if (it == fonts.end())
+		return;
+	Font* font = it->second;
+	font->Destroy();
+	delete font;
+	fonts.erase(it);
 }
 
 int Texts::GetTextHeight(unsigned fontId)
@@ -76,7 +88,7 @@ void Texts::DrawText(unsigned fontId, double x, double y, const char* fmt, ...)
 
 	glRasterPos2d(x, y);
 	glPushAttrib(GL_LIST_BIT);
-	glListBase(font->fontBase);
-	glCallLists((GLsizei)strlen(text), GL_UNSIGNED_BYTE, text);
+		glListBase(font->fontBase);
+		glCallLists((GLsizei)strlen(text), GL_UNSIGNED_BYTE, text);
 	glPopAttrib();
 }
